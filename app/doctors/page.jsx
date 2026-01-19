@@ -128,7 +128,7 @@ export default function Doctors() {
         ))}
       </div>
       
-      <footer style={styles.footer}>Hecho con 🧡 por Colmena 2026</footer>
+      <footer style={styles.footer}>Hecho con 🧡 por C-OG - Colmena 2026</footer>
     </main>
   )
 }
@@ -154,3 +154,4 @@ const styles = {
   contactBtn: { background: "#25d366", border: "none", padding: "0.75rem", borderRadius: "50%", cursor: "pointer", fontSize: "1.25rem" },
   footer: { textAlign: "center", padding: "1rem", color: "rgba(255,255,255,0.5)", fontSize: "0.875rem" },
 }
+

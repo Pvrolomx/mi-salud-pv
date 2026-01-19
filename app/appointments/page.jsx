@@ -34,7 +34,7 @@ export default function Appointments() {
         </div>
       </div>
       
-      <footer style={styles.footer}>Hecho con 🧡 por Colmena 2026</footer>
+      <footer style={styles.footer}>Hecho con 🧡 por C-OG - Colmena 2026</footer>
     </main>
   )
 }
@@ -52,3 +52,4 @@ const styles = {
   btn: { display: "inline-block", background: "#2563eb", color: "white", padding: "1rem 2rem", borderRadius: "0.5rem", textDecoration: "none", fontWeight: "600" },
   footer: { textAlign: "center", padding: "1rem", color: "rgba(255,255,255,0.5)", fontSize: "0.875rem" },
 }
+

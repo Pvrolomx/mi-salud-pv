@@ -90,7 +90,7 @@ export default function Home() {
 const styles = {
   main: {
     minHeight: "100vh",
-    background: "linear-gradient(to bottom, rgba(30, 58, 95, 0.9), rgba(15, 23, 42, 0.95)), url('https://raw.githubusercontent.com/Pvrolomx/canal/main/HCRPV/HCRPV%20Fondo.png') center/cover no-repeat fixed",
+    background: "linear-gradient(to bottom, rgba(30, 58, 95, 0.5), rgba(15, 23, 42, 0.6)), url('https://raw.githubusercontent.com/Pvrolomx/canal/main/HCRPV/HCRPV%20Fondo.png') center/cover no-repeat fixed",
     backgroundColor: "#0f172a",
     display: "flex",
     flexDirection: "column",
@@ -154,5 +154,6 @@ const styles = {
   buttonSub: { fontSize: "0.875rem", color: "rgba(255,255,255,0.7)", marginTop: "0.25rem" },
   footer: { textAlign: "center", padding: "1.25rem 1rem", color: "rgba(255,255,255,0.5)", fontSize: "0.875rem" },
 }
+
 
 

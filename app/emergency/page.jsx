@@ -11,7 +11,8 @@ const defaultContacts = [
     color: "#2563eb",
     phone: "523221234567",
     whatsapp: "523221234567",
-    email: "info@healthcareresourcespv.com"
+    email: "info@healthcareresourcespv.com",
+    address: null
   },
   { 
     id: "911",
@@ -22,13 +23,14 @@ const defaultContacts = [
     color: "#dc2626",
     phone: "911",
     whatsapp: null,
-    email: null
+    email: null,
+    address: null
   },
 ]
 
 const consulateOptions = [
-  { name: "US Consulate Guadalajara", phone: "523333682100", icon: "🇺🇸" },
-  { name: "Canadian Consulate", phone: "523331091054", icon: "🇨🇦" },
+  { name: "US Consulate Guadalajara", phone: "523333682100", icon: "🇺🇸", address: "Progreso 175, Col. Americana, Guadalajara" },
+  { name: "Canadian Consulate", phone: "523331091054", icon: "🇨🇦", address: "World Trade Center, Av. Mariano Otero 1249, Guadalajara" },
 ]
 
 const texts = {
@@ -39,6 +41,7 @@ const texts = {
     call: "Llamar",
     whatsapp: "WhatsApp",
     email: "Email",
+    map: "Mapa",
     addContact: "+ Agregar contacto",
     editContacts: "✏️ Editar",
     done: "✓ Listo",
@@ -50,12 +53,17 @@ const texts = {
     consulate: "Consulado",
     other: "Otro",
     name: "Nombre",
-    phone: "Teléfono",
+    phone: "Teléfono / Celular",
+    emailField: "Email (opcional)",
+    address: "Dirección (opcional)",
     save: "Guardar",
     cancel: "Cancelar",
     delete: "Eliminar",
-    selectDoctor: "Seleccionar de lista",
-    required: "Este contacto te puede salvar la vida"
+    selectFromList: "Seleccionar de lista",
+    addManually: "Agregar manual",
+    specialty: "Especialidad (opcional)",
+    required: "Este contacto te puede salvar la vida",
+    chooseOption: "¿Cómo quieres agregarlo?"
   },
   en: { 
     title: "Emergency", 
@@ -64,6 +72,7 @@ const texts = {
     call: "Call",
     whatsapp: "WhatsApp", 
     email: "Email",
+    map: "Map",
     addContact: "+ Add contact",
     editContacts: "✏️ Edit",
     done: "✓ Done",
@@ -75,12 +84,17 @@ const texts = {
     consulate: "Consulate",
     other: "Other",
     name: "Name",
-    phone: "Phone",
+    phone: "Phone / Cell",
+    emailField: "Email (optional)",
+    address: "Address (optional)",
     save: "Save",
     cancel: "Cancel",
     delete: "Delete",
-    selectDoctor: "Select from list",
-    required: "This contact can save your life"
+    selectFromList: "Select from list",
+    addManually: "Add manually",
+    specialty: "Specialty (optional)",
+    required: "This contact can save your life",
+    chooseOption: "How do you want to add?"
   }
 }
 
@@ -93,20 +107,37 @@ const relationIcons = {
   other: "📞"
 }
 
+const relationColors = {
+  spouse: "#ec4899",
+  child: "#8b5cf6",
+  family: "#f59e0b",
+  doctor: "#059669",
+  consulate: "#1e40af",
+  other: "#6b7280"
+}
+
 export default function Emergency() {
   const [lang, setLang] = useState("en")
   const [contacts, setContacts] = useState([])
   const [editMode, setEditMode] = useState(false)
   const [showForm, setShowForm] = useState(false)
-  const [showDoctors, setShowDoctors] = useState(false)
+  const [showDoctorChoice, setShowDoctorChoice] = useState(false)
+  const [showDoctorList, setShowDoctorList] = useState(false)
+  const [showConsulates, setShowConsulates] = useState(false)
   const [expanded, setExpanded] = useState(null)
-  const [formData, setFormData] = useState({ name: "", phone: "", relation: "family", whatsapp: true })
+  const [selectedRelation, setSelectedRelation] = useState(null)
+  const [formData, setFormData] = useState({ 
+    name: "", 
+    phone: "", 
+    email: "", 
+    address: "",
+    specialty: "",
+    hasWhatsapp: true 
+  })
   
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     if (params.get("lang")) setLang(params.get("lang"))
-    
-    // Cargar contactos de localStorage
     const saved = localStorage.getItem("emergencyContacts")
     if (saved) setContacts(JSON.parse(saved))
   }, [])
@@ -122,6 +153,27 @@ export default function Emergency() {
   const handleCall = (phone) => window.location.href = `tel:${phone}`
   const handleWhatsApp = (number) => window.open(`https://wa.me/${number}?text=${lang === "es" ? "Necesito ayuda urgente" : "I need urgent help"}`, "_blank")
   const handleEmail = (email) => window.location.href = `mailto:${email}`
+  const handleMap = (address) => window.open(`https://maps.google.com/?q=${encodeURIComponent(address)}`, "_blank")
+
+  const resetForm = () => {
+    setFormData({ name: "", phone: "", email: "", address: "", specialty: "", hasWhatsapp: true })
+    setSelectedRelation(null)
+    setShowForm(false)
+    setShowDoctorChoice(false)
+    setShowDoctorList(false)
+    setShowConsulates(false)
+  }
+
+  const selectRelation = (rel) => {
+    setSelectedRelation(rel)
+    if (rel === "doctor") {
+      setShowDoctorChoice(true)
+    } else if (rel === "consulate") {
+      setShowConsulates(true)
+    } else {
+      setShowForm(true)
+    }
+  }
 
   const addContact = () => {
     if (!formData.name || !formData.phone) return
@@ -129,37 +181,17 @@ export default function Emergency() {
       id: Date.now().toString(),
       type: "user",
       name: formData.name,
-      relation: formData.relation,
-      icon: relationIcons[formData.relation],
-      color: "#6b7280",
+      relation: selectedRelation,
+      icon: relationIcons[selectedRelation],
+      color: relationColors[selectedRelation],
       phone: formData.phone.replace(/\D/g, ""),
-      whatsapp: formData.whatsapp ? formData.phone.replace(/\D/g, "") : null,
-      email: null
+      whatsapp: formData.hasWhatsapp ? formData.phone.replace(/\D/g, "") : null,
+      email: formData.email || null,
+      address: formData.address || null,
+      specialty: formData.specialty || null
     }
     saveContacts([newContact, ...contacts])
-    setFormData({ name: "", phone: "", relation: "family", whatsapp: true })
-    setShowForm(false)
-  }
-
-  const addDoctor = (doctor) => {
-    const newContact = {
-      id: Date.now().toString(),
-      type: "user",
-      name: doctor.name,
-      relation: "doctor",
-      icon: "👨‍⚕️",
-      color: "#059669",
-      phone: "523221234567", // HCRPV para agendar
-      whatsapp: "523221234567",
-      email: null,
-      specialty: doctor.specialty
-    }
-    saveContacts([newContact, ...contacts.filter(c => c.relation !== "doctor")])
-    setShowDoctors(false)
-  }
-
-  const deleteContact = (id) => {
-    saveContacts(contacts.filter(c => c.id !== id))
+    resetForm()
   }
 
   const addConsulate = (consulate) => {
@@ -172,10 +204,165 @@ export default function Emergency() {
       color: "#1e40af",
       phone: consulate.phone,
       whatsapp: null,
-      email: null
+      email: null,
+      address: consulate.address
     }
     saveContacts([newContact, ...contacts.filter(c => c.relation !== "consulate")])
+    resetForm()
   }
+
+  const deleteContact = (id) => {
+    saveContacts(contacts.filter(c => c.id !== id))
+  }
+
+  // Relation selection screen
+  const RelationSelector = () => (
+    <div style={styles.formOverlay}>
+      <div style={styles.formCard}>
+        <h3 style={styles.formTitle}>{t.addContact}</h3>
+        <div style={styles.relationGrid}>
+          {["spouse", "child", "family", "doctor", "consulate", "other"].map(rel => (
+            <button key={rel} onClick={() => selectRelation(rel)} style={styles.relationBtn}>
+              <span style={{fontSize: "2rem"}}>{relationIcons[rel]}</span>
+              <span style={{fontSize: "0.875rem", marginTop: "0.25rem"}}>{t[rel]}</span>
+            </button>
+          ))}
+        </div>
+        <button onClick={resetForm} style={styles.cancelBtn}>{t.cancel}</button>
+      </div>
+    </div>
+  )
+
+  // Contact form
+  const ContactForm = () => (
+    <div style={styles.formOverlay}>
+      <div style={styles.formCard}>
+        <div style={styles.formHeader}>
+          <span style={{fontSize: "2rem"}}>{relationIcons[selectedRelation]}</span>
+          <h3 style={styles.formTitle}>{t[selectedRelation]}</h3>
+        </div>
+        
+        <input
+          type="text"
+          placeholder={t.name + " *"}
+          value={formData.name}
+          onChange={(e) => setFormData({...formData, name: e.target.value})}
+          style={styles.input}
+        />
+        <input
+          type="tel"
+          placeholder={t.phone + " *"}
+          value={formData.phone}
+          onChange={(e) => setFormData({...formData, phone: e.target.value})}
+          style={styles.input}
+        />
+        <input
+          type="email"
+          placeholder={t.emailField}
+          value={formData.email}
+          onChange={(e) => setFormData({...formData, email: e.target.value})}
+          style={styles.input}
+        />
+        <input
+          type="text"
+          placeholder={t.address}
+          value={formData.address}
+          onChange={(e) => setFormData({...formData, address: e.target.value})}
+          style={styles.input}
+        />
+        
+        {selectedRelation === "doctor" && (
+          <input
+            type="text"
+            placeholder={t.specialty}
+            value={formData.specialty}
+            onChange={(e) => setFormData({...formData, specialty: e.target.value})}
+            style={styles.input}
+          />
+        )}
+
+        <label style={styles.checkLabel}>
+          <input
+            type="checkbox"
+            checked={formData.hasWhatsapp}
+            onChange={(e) => setFormData({...formData, hasWhatsapp: e.target.checked})}
+            style={styles.checkbox}
+          />
+          <span>📱 WhatsApp</span>
+        </label>
+
+        <div style={styles.formActions}>
+          <button onClick={resetForm} style={styles.cancelBtn}>{t.cancel}</button>
+          <button onClick={addContact} style={styles.saveBtn}>{t.save}</button>
+        </div>
+      </div>
+    </div>
+  )
+
+  // Doctor choice: list or manual
+  const DoctorChoice = () => (
+    <div style={styles.formOverlay}>
+      <div style={styles.formCard}>
+        <div style={styles.formHeader}>
+          <span style={{fontSize: "2rem"}}>👨‍⚕️</span>
+          <h3 style={styles.formTitle}>{t.doctor}</h3>
+        </div>
+        <p style={{textAlign: "center", color: "rgba(255,255,255,0.7)", marginBottom: "1rem"}}>{t.chooseOption}</p>
+        
+        <button 
+          onClick={() => { setShowDoctorChoice(false); setShowDoctorList(true); }} 
+          style={styles.choiceBtn}
+        >
+          📋 {t.selectFromList}
+        </button>
+        <button 
+          onClick={() => { setShowDoctorChoice(false); setShowForm(true); }} 
+          style={styles.choiceBtn}
+        >
+          ✏️ {t.addManually}
+        </button>
+        
+        <button onClick={resetForm} style={{...styles.cancelBtn, marginTop: "1rem"}}>{t.cancel}</button>
+      </div>
+    </div>
+  )
+
+  // Doctor list
+  const DoctorList = () => (
+    <div style={styles.formOverlay}>
+      <div style={styles.formCard}>
+        <h3 style={styles.formTitle}>{t.selectFromList}</h3>
+        <a 
+          href={`/doctors?lang=${lang}&selectMode=emergency`} 
+          style={styles.doctorListBtn}
+        >
+          👨‍⚕️ {t.selectFromList} →
+        </a>
+        <button onClick={resetForm} style={{...styles.cancelBtn, marginTop: "1rem"}}>{t.cancel}</button>
+      </div>
+    </div>
+  )
+
+  // Consulate list
+  const ConsulateList = () => (
+    <div style={styles.formOverlay}>
+      <div style={styles.formCard}>
+        <h3 style={styles.formTitle}>{t.consulate}</h3>
+        <div style={styles.consulateList}>
+          {consulateOptions.map((c, i) => (
+            <button key={i} onClick={() => addConsulate(c)} style={styles.consulateBtn}>
+              <span style={{fontSize: "2rem"}}>{c.icon}</span>
+              <div style={{textAlign: "left"}}>
+                <div style={{fontWeight: "600"}}>{c.name}</div>
+                <div style={{fontSize: "0.75rem", color: "rgba(255,255,255,0.6)"}}>{c.address}</div>
+              </div>
+            </button>
+          ))}
+        </div>
+        <button onClick={resetForm} style={{...styles.cancelBtn, marginTop: "1rem"}}>{t.cancel}</button>
+      </div>
+    </div>
+  )
 
   return (
     <main style={styles.main}>
@@ -192,115 +379,27 @@ export default function Emergency() {
         <p style={styles.subtitle}>{t.subtitle}</p>
       </div>
 
-      {/* Botones de acción */}
       <div style={styles.actionBar}>
         {!editMode ? (
           <>
-            <button onClick={() => setShowForm(true)} style={styles.addBtn}>
-              {t.addContact}
-            </button>
-            <button onClick={() => setEditMode(true)} style={styles.editBtn}>
-              {t.editContacts}
-            </button>
+            <button onClick={() => setSelectedRelation("select")} style={styles.addBtn}>{t.addContact}</button>
+            {contacts.length > 0 && (
+              <button onClick={() => setEditMode(true)} style={styles.editBtn}>{t.editContacts}</button>
+            )}
           </>
         ) : (
-          <button onClick={() => setEditMode(false)} style={styles.doneBtn}>
-            {t.done}
-          </button>
+          <button onClick={() => setEditMode(false)} style={styles.doneBtn}>{t.done}</button>
         )}
       </div>
 
-      {/* Formulario para agregar */}
-      {showForm && (
-        <div style={styles.formOverlay}>
-          <div style={styles.formCard}>
-            <h3 style={styles.formTitle}>{t.addContact}</h3>
-            
-            <div style={styles.relationGrid}>
-              {["spouse", "child", "family", "doctor", "consulate", "other"].map(rel => (
-                <button
-                  key={rel}
-                  onClick={() => {
-                    if (rel === "doctor") { setShowForm(false); setShowDoctors(true); }
-                    else if (rel === "consulate") { setShowForm(false); }
-                    else setFormData({...formData, relation: rel})
-                  }}
-                  style={{
-                    ...styles.relationBtn,
-                    ...(formData.relation === rel ? styles.relationActive : {})
-                  }}
-                >
-                  <span style={{fontSize: "1.5rem"}}>{relationIcons[rel]}</span>
-                  <span style={{fontSize: "0.75rem"}}>{t[rel]}</span>
-                </button>
-              ))}
-            </div>
+      {/* Modals */}
+      {selectedRelation === "select" && <RelationSelector />}
+      {showForm && <ContactForm />}
+      {showDoctorChoice && <DoctorChoice />}
+      {showDoctorList && <DoctorList />}
+      {showConsulates && <ConsulateList />}
 
-            {formData.relation !== "doctor" && formData.relation !== "consulate" && (
-              <>
-                <input
-                  type="text"
-                  placeholder={t.name}
-                  value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  style={styles.input}
-                />
-                <input
-                  type="tel"
-                  placeholder={t.phone}
-                  value={formData.phone}
-                  onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                  style={styles.input}
-                />
-                <label style={styles.checkLabel}>
-                  <input
-                    type="checkbox"
-                    checked={formData.whatsapp}
-                    onChange={(e) => setFormData({...formData, whatsapp: e.target.checked})}
-                  />
-                  WhatsApp
-                </label>
-              </>
-            )}
-
-            <div style={styles.formActions}>
-              <button onClick={() => setShowForm(false)} style={styles.cancelBtn}>{t.cancel}</button>
-              {formData.relation !== "doctor" && formData.relation !== "consulate" && (
-                <button onClick={addContact} style={styles.saveBtn}>{t.save}</button>
-              )}
-            </div>
-
-            {/* Consulados */}
-            {formData.relation === "consulate" && (
-              <div style={styles.consulateList}>
-                {consulateOptions.map((c, i) => (
-                  <button key={i} onClick={() => { addConsulate(c); setShowForm(false); }} style={styles.consulateBtn}>
-                    <span style={{fontSize: "1.5rem"}}>{c.icon}</span>
-                    <span>{c.name}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Lista de doctores */}
-      {showDoctors && (
-        <div style={styles.formOverlay}>
-          <div style={styles.formCard}>
-            <h3 style={styles.formTitle}>{t.selectDoctor}</h3>
-            <div style={styles.doctorList}>
-              <a href={`/doctors?lang=${lang}&select=true`} style={styles.doctorLink}>
-                👨‍⚕️ {t.selectDoctor} →
-              </a>
-            </div>
-            <button onClick={() => setShowDoctors(false)} style={styles.cancelBtn}>{t.cancel}</button>
-          </div>
-        </div>
-      )}
-
-      {/* Lista de contactos */}
+      {/* Contact list */}
       <div style={styles.contactList}>
         {contacts.length === 0 && (
           <div style={styles.emptyState}>
@@ -320,6 +419,7 @@ export default function Emergency() {
                 <span style={styles.contactName}>{contact.name}</span>
                 <span style={styles.contactRelation}>
                   {typeof contact.relation === "object" ? contact.relation[lang] : t[contact.relation] || contact.relation}
+                  {contact.specialty && ` • ${contact.specialty}`}
                 </span>
               </div>
               {editMode && contact.type === "user" ? (
@@ -342,6 +442,11 @@ export default function Emergency() {
                 {contact.email && (
                   <button onClick={() => handleEmail(contact.email)} style={{...styles.actionBtn, background: "#3b82f6"}}>
                     ✉️ {t.email}
+                  </button>
+                )}
+                {contact.address && (
+                  <button onClick={() => handleMap(contact.address)} style={{...styles.actionBtn, background: "#f59e0b"}}>
+                    📍 {t.map}
                   </button>
                 )}
               </div>
@@ -372,21 +477,22 @@ const styles = {
   addBtn: { padding: "0.75rem 1.5rem", background: "#22c55e", border: "none", borderRadius: "2rem", color: "white", fontWeight: "600", cursor: "pointer", fontSize: "1rem" },
   editBtn: { padding: "0.75rem 1.5rem", background: "rgba(255,255,255,0.2)", border: "none", borderRadius: "2rem", color: "white", fontWeight: "600", cursor: "pointer", fontSize: "1rem" },
   doneBtn: { padding: "0.75rem 2rem", background: "#3b82f6", border: "none", borderRadius: "2rem", color: "white", fontWeight: "600", cursor: "pointer", fontSize: "1rem" },
-  formOverlay: { position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.8)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem", zIndex: 100 },
-  formCard: { background: "#1e293b", borderRadius: "1rem", padding: "1.5rem", width: "100%", maxWidth: "400px" },
-  formTitle: { margin: "0 0 1rem", textAlign: "center" },
-  relationGrid: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "0.5rem", marginBottom: "1rem" },
-  relationBtn: { display: "flex", flexDirection: "column", alignItems: "center", gap: "0.25rem", padding: "0.75rem", background: "rgba(255,255,255,0.1)", border: "none", borderRadius: "0.75rem", color: "white", cursor: "pointer" },
-  relationActive: { background: "#3b82f6" },
-  input: { width: "100%", padding: "1rem", marginBottom: "0.75rem", borderRadius: "0.5rem", border: "none", fontSize: "1rem", background: "rgba(255,255,255,0.1)", color: "white" },
-  checkLabel: { display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1rem", color: "rgba(255,255,255,0.8)" },
-  formActions: { display: "flex", gap: "0.75rem" },
-  cancelBtn: { flex: 1, padding: "1rem", background: "rgba(255,255,255,0.1)", border: "none", borderRadius: "0.5rem", color: "white", cursor: "pointer" },
-  saveBtn: { flex: 1, padding: "1rem", background: "#22c55e", border: "none", borderRadius: "0.5rem", color: "white", fontWeight: "600", cursor: "pointer" },
-  consulateList: { display: "flex", flexDirection: "column", gap: "0.5rem", marginTop: "1rem" },
-  consulateBtn: { display: "flex", alignItems: "center", gap: "1rem", padding: "1rem", background: "rgba(255,255,255,0.1)", border: "none", borderRadius: "0.75rem", color: "white", cursor: "pointer" },
-  doctorList: { padding: "1rem 0" },
-  doctorLink: { display: "block", padding: "1rem", background: "rgba(255,255,255,0.1)", borderRadius: "0.75rem", color: "white", textDecoration: "none", textAlign: "center" },
+  formOverlay: { position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.85)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem", zIndex: 100 },
+  formCard: { background: "#1e293b", borderRadius: "1.5rem", padding: "1.5rem", width: "100%", maxWidth: "400px", maxHeight: "90vh", overflowY: "auto" },
+  formHeader: { display: "flex", alignItems: "center", justifyContent: "center", gap: "0.75rem", marginBottom: "1rem" },
+  formTitle: { margin: 0, fontSize: "1.25rem" },
+  relationGrid: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "0.75rem", marginBottom: "1rem" },
+  relationBtn: { display: "flex", flexDirection: "column", alignItems: "center", padding: "1rem 0.5rem", background: "rgba(255,255,255,0.1)", border: "none", borderRadius: "1rem", color: "white", cursor: "pointer", transition: "background 0.2s" },
+  input: { width: "100%", padding: "1rem", marginBottom: "0.75rem", borderRadius: "0.75rem", border: "none", fontSize: "1rem", background: "rgba(255,255,255,0.1)", color: "white", boxSizing: "border-box" },
+  checkLabel: { display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1rem", color: "rgba(255,255,255,0.9)", fontSize: "1rem" },
+  checkbox: { width: "20px", height: "20px", accentColor: "#22c55e" },
+  formActions: { display: "flex", gap: "0.75rem", marginTop: "0.5rem" },
+  cancelBtn: { flex: 1, padding: "1rem", background: "rgba(255,255,255,0.1)", border: "none", borderRadius: "0.75rem", color: "white", cursor: "pointer", fontSize: "1rem" },
+  saveBtn: { flex: 1, padding: "1rem", background: "#22c55e", border: "none", borderRadius: "0.75rem", color: "white", fontWeight: "600", cursor: "pointer", fontSize: "1rem" },
+  choiceBtn: { width: "100%", padding: "1.25rem", marginBottom: "0.75rem", background: "rgba(255,255,255,0.1)", border: "none", borderRadius: "1rem", color: "white", cursor: "pointer", fontSize: "1.1rem", fontWeight: "500" },
+  consulateList: { display: "flex", flexDirection: "column", gap: "0.75rem" },
+  consulateBtn: { display: "flex", alignItems: "center", gap: "1rem", padding: "1rem", background: "rgba(255,255,255,0.1)", border: "none", borderRadius: "1rem", color: "white", cursor: "pointer", textAlign: "left" },
+  doctorListBtn: { display: "block", padding: "1.25rem", background: "rgba(255,255,255,0.1)", borderRadius: "1rem", color: "white", textDecoration: "none", textAlign: "center", fontSize: "1.1rem" },
   contactList: { flex: 1, padding: "0 1rem", display: "flex", flexDirection: "column", gap: "0.75rem", overflowY: "auto" },
   emptyState: { textAlign: "center", padding: "2rem 1rem" },
   emptyText: { fontSize: "1.25rem", margin: "0 0 0.5rem" },
@@ -398,9 +504,9 @@ const styles = {
   contactName: { fontSize: "1.1rem", fontWeight: "700" },
   contactRelation: { fontSize: "0.875rem", color: "rgba(255,255,255,0.6)" },
   expandIcon: { fontSize: "1rem", color: "rgba(255,255,255,0.5)" },
-  deleteBtn: { background: "#ef4444", border: "none", padding: "0.5rem", borderRadius: "0.5rem", cursor: "pointer", fontSize: "1rem" },
+  deleteBtn: { background: "#ef4444", border: "none", padding: "0.5rem 0.75rem", borderRadius: "0.5rem", cursor: "pointer", fontSize: "1rem" },
   actions: { padding: "0 1rem 1rem", display: "flex", gap: "0.5rem", flexWrap: "wrap" },
-  actionBtn: { flex: "1 1 auto", minWidth: "80px", padding: "0.875rem", border: "none", borderRadius: "0.75rem", color: "white", fontSize: "0.9rem", fontWeight: "600", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "0.4rem" },
+  actionBtn: { flex: "1 1 auto", minWidth: "70px", padding: "0.75rem", border: "none", borderRadius: "0.75rem", color: "white", fontSize: "0.85rem", fontWeight: "600", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "0.3rem" },
   bottomNav: { padding: "1rem", display: "flex", justifyContent: "center" },
   homeBtn: { display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "1rem 2rem", background: "rgba(255,255,255,0.2)", color: "white", textDecoration: "none", borderRadius: "2rem", fontSize: "1.1rem", fontWeight: "600" },
   footer: { textAlign: "center", padding: "1rem", color: "rgba(255,255,255,0.5)", fontSize: "0.875rem" },

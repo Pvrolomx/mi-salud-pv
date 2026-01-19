@@ -24,6 +24,13 @@ const texts = {
   }
 }
 
+const btnImages = {
+  emergency: "https://raw.githubusercontent.com/Pvrolomx/canal/main/HCRPV/1.%20Emergencia.png",
+  doctors: "https://raw.githubusercontent.com/Pvrolomx/canal/main/HCRPV/2.%20Buscar%20Doctor.png",
+  appointments: "https://raw.githubusercontent.com/Pvrolomx/canal/main/HCRPV/3.%20Mis%20Citas.png",
+  help: "https://raw.githubusercontent.com/Pvrolomx/canal/main/HCRPV/4.%20Necesito%20Ayuda.png",
+}
+
 export default function Home() {
   const [lang, setLang] = useState("en")
   const t = texts[lang]
@@ -42,28 +49,36 @@ export default function Home() {
       </header>
 
       <div style={styles.buttonContainer}>
-        <button onClick={handleEmergency} style={{...styles.button, ...styles.emergency}}>
-          <span style={styles.icon}>🆘</span>
-          <span style={styles.buttonText}>{t.emergency}</span>
-          <span style={styles.buttonSub}>{t.emergencySub}</span>
+        <button onClick={handleEmergency} style={styles.button}>
+          <img src={btnImages.emergency} alt="Emergency" style={styles.btnImg} />
+          <div style={styles.btnTextContainer}>
+            <span style={styles.buttonText}>{t.emergency}</span>
+            <span style={styles.buttonSub}>{t.emergencySub}</span>
+          </div>
         </button>
 
-        <button onClick={() => window.location.href = `/doctors?lang=${lang}`} style={{...styles.button, ...styles.doctorsBtn}}>
-          <span style={styles.icon}>👨‍⚕️</span>
-          <span style={styles.buttonText}>{t.doctors}</span>
-          <span style={styles.buttonSub}>{t.doctorsSub}</span>
+        <button onClick={() => window.location.href = `/doctors?lang=${lang}`} style={styles.button}>
+          <img src={btnImages.doctors} alt="Doctors" style={styles.btnImg} />
+          <div style={styles.btnTextContainer}>
+            <span style={styles.buttonText}>{t.doctors}</span>
+            <span style={styles.buttonSub}>{t.doctorsSub}</span>
+          </div>
         </button>
 
-        <button onClick={() => window.location.href = `/appointments?lang=${lang}`} style={{...styles.button, ...styles.appointments}}>
-          <span style={styles.icon}>📅</span>
-          <span style={styles.buttonText}>{t.appointments}</span>
-          <span style={styles.buttonSub}>{t.appointmentsSub}</span>
+        <button onClick={() => window.location.href = `/appointments?lang=${lang}`} style={styles.button}>
+          <img src={btnImages.appointments} alt="Appointments" style={styles.btnImg} />
+          <div style={styles.btnTextContainer}>
+            <span style={styles.buttonText}>{t.appointments}</span>
+            <span style={styles.buttonSub}>{t.appointmentsSub}</span>
+          </div>
         </button>
 
-        <button onClick={handleWhatsApp} style={{...styles.button, ...styles.helpBtn}}>
-          <span style={styles.icon}>💬</span>
-          <span style={styles.buttonText}>{t.help}</span>
-          <span style={styles.buttonSub}>{t.helpSub}</span>
+        <button onClick={handleWhatsApp} style={styles.button}>
+          <img src={btnImages.help} alt="Help" style={styles.btnImg} />
+          <div style={styles.btnTextContainer}>
+            <span style={styles.buttonText}>{t.help}</span>
+            <span style={styles.buttonSub}>{t.helpSub}</span>
+          </div>
         </button>
       </div>
 
@@ -99,9 +114,6 @@ const styles = {
     cursor: "pointer",
     fontSize: "1rem",
     fontWeight: "600",
-    display: "flex",
-    alignItems: "center",
-    gap: "0.5rem",
   },
   buttonContainer: {
     flex: 1,
@@ -116,24 +128,29 @@ const styles = {
   },
   button: {
     display: "flex",
-    flexDirection: "column",
     alignItems: "center",
-    justifyContent: "center",
-    padding: "1.5rem",
+    gap: "1rem",
+    padding: "1rem",
     border: "none",
     borderRadius: "1rem",
     cursor: "pointer",
     transition: "transform 0.2s, box-shadow 0.2s",
     boxShadow: "0 4px 15px rgba(0,0,0,0.3)",
-    minHeight: "100px",
+    background: "rgba(255,255,255,0.1)",
+    backdropFilter: "blur(10px)",
   },
-  icon: { fontSize: "2rem", marginBottom: "0.5rem" },
-  buttonText: { fontSize: "1.25rem", fontWeight: "700", color: "white", letterSpacing: "0.5px" },
-  buttonSub: { fontSize: "0.875rem", color: "rgba(255,255,255,0.8)", marginTop: "0.25rem" },
-  emergency: { background: "linear-gradient(135deg, #dc2626, #b91c1c)" },
-  doctorsBtn: { background: "linear-gradient(135deg, #2563eb, #1d4ed8)" },
-  appointments: { background: "linear-gradient(135deg, #059669, #047857)" },
-  helpBtn: { background: "linear-gradient(135deg, #7c3aed, #6d28d9)" },
+  btnImg: {
+    width: "70px",
+    height: "70px",
+    borderRadius: "1rem",
+    objectFit: "cover",
+  },
+  btnTextContainer: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+  },
+  buttonText: { fontSize: "1.1rem", fontWeight: "700", color: "white" },
+  buttonSub: { fontSize: "0.875rem", color: "rgba(255,255,255,0.7)", marginTop: "0.25rem" },
   footer: { textAlign: "center", padding: "1rem", color: "rgba(255,255,255,0.5)", fontSize: "0.875rem" },
 }
-

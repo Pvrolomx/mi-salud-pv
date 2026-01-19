@@ -36,7 +36,7 @@ export default function Home() {
   const t = texts[lang]
   const whatsappNumber = "523221234567"
   
-  const handleEmergency = () => window.location.href = "tel:911"
+  const handleEmergency = () => window.location.href = `/emergency?lang=${lang}`
   const handleWhatsApp = () => window.open(`https://wa.me/${whatsappNumber}?text=${lang === "es" ? "Hola, necesito ayuda" : "Hello, I need help"}`, "_blank")
 
   return (
@@ -154,6 +154,7 @@ const styles = {
   buttonSub: { fontSize: "0.875rem", color: "rgba(255,255,255,0.7)", marginTop: "0.25rem" },
   footer: { textAlign: "center", padding: "1.25rem 1rem", color: "rgba(255,255,255,0.5)", fontSize: "0.875rem" },
 }
+
 
 
 

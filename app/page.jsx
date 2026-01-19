@@ -73,7 +73,7 @@ export default function Home() {
           </div>
         </button>
 
-        <button onClick={handleWhatsApp} style={styles.button}>
+        <button onClick={() => window.location.href = `/help?lang=${lang}`} style={styles.button}>
           <img src={btnImages.help} alt="Help" style={styles.btnImg} />
           <div style={styles.btnTextContainer}>
             <span style={styles.buttonText}>{t.help}</span>
@@ -154,6 +154,7 @@ const styles = {
   buttonSub: { fontSize: "0.875rem", color: "rgba(255,255,255,0.7)", marginTop: "0.25rem" },
   footer: { textAlign: "center", padding: "1.25rem 1rem", color: "rgba(255,255,255,0.5)", fontSize: "0.875rem" },
 }
+
 
 
 

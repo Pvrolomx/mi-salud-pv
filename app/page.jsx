@@ -67,7 +67,7 @@ export default function Home() {
         </button>
       </div>
 
-      <footer style={styles.footer}>Hecho con 🧡 por Colmena 2026</footer>
+      <footer style={styles.footer}>Hecho con 🧡 por C-OG - Colmena 2026</footer>
     </main>
   )
 }
@@ -136,3 +136,4 @@ const styles = {
   helpBtn: { background: "linear-gradient(135deg, #7c3aed, #6d28d9)" },
   footer: { textAlign: "center", padding: "1rem", color: "rgba(255,255,255,0.5)", fontSize: "0.875rem" },
 }
+

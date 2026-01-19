@@ -511,3 +511,4 @@ const styles = {
   homeBtn: { display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "1rem 2rem", background: "rgba(255,255,255,0.2)", color: "white", textDecoration: "none", borderRadius: "2rem", fontSize: "1.1rem", fontWeight: "600" },
   footer: { textAlign: "center", padding: "1rem", color: "rgba(255,255,255,0.5)", fontSize: "0.875rem" },
 }
+

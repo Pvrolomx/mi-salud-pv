@@ -98,13 +98,13 @@ const styles = {
   },
   header: {
     background: "rgba(30, 58, 95, 0.85)",
-    padding: "1rem",
+    padding: "1.25rem 1rem",
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
     backdropFilter: "blur(10px)",
   },
-  logo: { maxHeight: "50px", width: "auto" },
+  logo: { maxHeight: "75px", width: "auto" },
   langBtn: {
     background: "rgba(255,255,255,0.15)",
     border: "1px solid rgba(255,255,255,0.3)",
@@ -130,7 +130,7 @@ const styles = {
     display: "flex",
     alignItems: "center",
     gap: "1rem",
-    padding: "1rem",
+    padding: "1.25rem 1rem",
     border: "none",
     borderRadius: "1rem",
     cursor: "pointer",
@@ -152,5 +152,6 @@ const styles = {
   },
   buttonText: { fontSize: "1.1rem", fontWeight: "700", color: "white" },
   buttonSub: { fontSize: "0.875rem", color: "rgba(255,255,255,0.7)", marginTop: "0.25rem" },
-  footer: { textAlign: "center", padding: "1rem", color: "rgba(255,255,255,0.5)", fontSize: "0.875rem" },
+  footer: { textAlign: "center", padding: "1.25rem 1rem", color: "rgba(255,255,255,0.5)", fontSize: "0.875rem" },
 }
+

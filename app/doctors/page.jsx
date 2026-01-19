@@ -48,18 +48,37 @@ const doctors = [
 ]
 
 const texts = {
-  es: { title: "Doctores", back: "← Regresar", all: "Todos", search: "Buscar doctor...", contact: "Contactar" },
-  en: { title: "Doctors", back: "← Back", all: "All", search: "Search doctor...", contact: "Contact" }
+  es: { 
+    title: "Doctores", 
+    back: "← Regresar", 
+    all: "Todos", 
+    search: "Buscar doctor...", 
+    bookAppointment: "📅 Concertar Cita",
+    addToEmergency: "🆘 Agregar a Emergencia",
+    selectForEmergency: "✓ Seleccionar"
+  },
+  en: { 
+    title: "Doctors", 
+    back: "← Back", 
+    all: "All", 
+    search: "Search doctor...", 
+    bookAppointment: "📅 Book Appointment",
+    addToEmergency: "🆘 Add to Emergency",
+    selectForEmergency: "✓ Select"
+  }
 }
 
 export default function Doctors() {
   const [lang, setLang] = useState("en")
   const [filter, setFilter] = useState("all")
   const [search, setSearch] = useState("")
+  const [expanded, setExpanded] = useState(null)
+  const [selectMode, setSelectMode] = useState(null)
   
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     if (params.get("lang")) setLang(params.get("lang"))
+    if (params.get("selectMode")) setSelectMode(params.get("selectMode"))
   }, [])
 
   const t = texts[lang]
@@ -73,11 +92,40 @@ export default function Doctors() {
     return matchesFilter && matchesSearch
   })
 
-  const whatsapp = (name) => {
+  const hcrpvNumber = "523221234567"
+
+  const bookAppointment = (doc) => {
+    const specialty = lang === "es" ? doc.specialtyEs : doc.specialty
     const msg = lang === "es" 
-      ? `Hola, me gustaría agendar una cita con ${name}` 
-      : `Hello, I would like to schedule an appointment with ${name}`
-    window.open(`https://wa.me/523221234567?text=${encodeURIComponent(msg)}`, "_blank")
+      ? `Hola, quiero agendar una cita con ${doc.name} (${specialty})` 
+      : `Hello, I would like to schedule an appointment with ${doc.name} (${specialty})`
+    window.open(`https://wa.me/${hcrpvNumber}?text=${encodeURIComponent(msg)}`, "_blank")
+  }
+
+  const addToEmergency = (doc) => {
+    const newContact = {
+      id: Date.now().toString(),
+      type: "user",
+      name: doc.name,
+      relation: "doctor",
+      icon: "👨‍⚕️",
+      color: "#059669",
+      phone: hcrpvNumber,
+      whatsapp: hcrpvNumber,
+      email: null,
+      address: null,
+      specialty: lang === "es" ? doc.specialtyEs : doc.specialty
+    }
+    const saved = localStorage.getItem("emergencyContacts")
+    const contacts = saved ? JSON.parse(saved) : []
+    const filtered = contacts.filter(c => c.relation !== "doctor")
+    localStorage.setItem("emergencyContacts", JSON.stringify([newContact, ...filtered]))
+    
+    if (selectMode === "emergency") {
+      window.location.href = `/emergency?lang=${lang}`
+    } else {
+      alert(lang === "es" ? "✓ Doctor agregado a contactos de emergencia" : "✓ Doctor added to emergency contacts")
+    }
   }
 
   return (
@@ -116,14 +164,33 @@ export default function Doctors() {
       <div style={styles.list}>
         {filtered.map((doc, i) => (
           <div key={i} style={styles.card}>
-            <img src={doc.img} alt={doc.name} style={styles.avatar} />
-            <div style={styles.info}>
-              <h2 style={styles.name}>{doc.name}</h2>
-              <p style={styles.specialty}>{lang === "es" ? doc.specialtyEs : doc.specialty}</p>
-            </div>
-            <button onClick={() => whatsapp(doc.name)} style={styles.contactBtn}>
-              💬
+            <button onClick={() => setExpanded(expanded === i ? null : i)} style={styles.cardHeader}>
+              <img src={doc.img} alt={doc.name} style={styles.avatar} />
+              <div style={styles.info}>
+                <h2 style={styles.name}>{doc.name}</h2>
+                <p style={styles.specialty}>{lang === "es" ? doc.specialtyEs : doc.specialty}</p>
+              </div>
+              <span style={styles.expandIcon}>{expanded === i ? "▲" : "▼"}</span>
             </button>
+            
+            {expanded === i && (
+              <div style={styles.actions}>
+                {selectMode === "emergency" ? (
+                  <button onClick={() => addToEmergency(doc)} style={styles.selectBtn}>
+                    {t.selectForEmergency}
+                  </button>
+                ) : (
+                  <>
+                    <button onClick={() => bookAppointment(doc)} style={styles.bookBtn}>
+                      {t.bookAppointment}
+                    </button>
+                    <button onClick={() => addToEmergency(doc)} style={styles.emergencyBtn}>
+                      {t.addToEmergency}
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -140,18 +207,22 @@ const styles = {
   title: { fontSize: "1.25rem", margin: 0 },
   langBtn: { background: "rgba(255,255,255,0.15)", border: "none", padding: "0.5rem", borderRadius: "50%", cursor: "pointer", fontSize: "1.25rem" },
   searchBox: { padding: "1rem" },
-  searchInput: { width: "100%", padding: "0.75rem 1rem", borderRadius: "0.5rem", border: "none", fontSize: "1rem", background: "rgba(255,255,255,0.1)", color: "white" },
+  searchInput: { width: "100%", padding: "0.75rem 1rem", borderRadius: "0.5rem", border: "none", fontSize: "1rem", background: "rgba(255,255,255,0.1)", color: "white", boxSizing: "border-box" },
   filters: { display: "flex", gap: "0.5rem", padding: "0 1rem", overflowX: "auto", paddingBottom: "0.5rem" },
   filterBtn: { padding: "0.5rem 1rem", borderRadius: "2rem", border: "none", background: "rgba(255,255,255,0.1)", color: "white", cursor: "pointer", whiteSpace: "nowrap", fontSize: "0.875rem" },
   filterActive: { background: "#2563eb" },
   count: { padding: "0.5rem 1rem", color: "rgba(255,255,255,0.5)", fontSize: "0.875rem" },
   list: { padding: "0 1rem 1rem", display: "flex", flexDirection: "column", gap: "0.75rem" },
-  card: { background: "rgba(255,255,255,0.08)", borderRadius: "1rem", padding: "1rem", display: "flex", alignItems: "center", gap: "1rem" },
+  card: { background: "rgba(255,255,255,0.08)", borderRadius: "1rem", overflow: "hidden" },
+  cardHeader: { width: "100%", padding: "1rem", display: "flex", alignItems: "center", gap: "1rem", background: "transparent", border: "none", color: "white", cursor: "pointer", textAlign: "left" },
   avatar: { width: "60px", height: "60px", borderRadius: "50%", objectFit: "cover" },
   info: { flex: 1 },
   name: { margin: 0, fontSize: "1rem", fontWeight: "600" },
   specialty: { margin: "0.25rem 0 0", color: "rgba(255,255,255,0.6)", fontSize: "0.875rem" },
-  contactBtn: { background: "#25d366", border: "none", padding: "0.75rem", borderRadius: "50%", cursor: "pointer", fontSize: "1.25rem" },
+  expandIcon: { color: "rgba(255,255,255,0.5)" },
+  actions: { padding: "0 1rem 1rem", display: "flex", gap: "0.5rem", flexWrap: "wrap" },
+  bookBtn: { flex: 1, padding: "0.875rem", background: "#22c55e", border: "none", borderRadius: "0.75rem", color: "white", fontSize: "0.95rem", fontWeight: "600", cursor: "pointer" },
+  emergencyBtn: { flex: 1, padding: "0.875rem", background: "#dc2626", border: "none", borderRadius: "0.75rem", color: "white", fontSize: "0.95rem", fontWeight: "600", cursor: "pointer" },
+  selectBtn: { flex: 1, padding: "1rem", background: "#22c55e", border: "none", borderRadius: "0.75rem", color: "white", fontSize: "1.1rem", fontWeight: "600", cursor: "pointer" },
   footer: { textAlign: "center", padding: "1rem", color: "rgba(255,255,255,0.5)", fontSize: "0.875rem" },
 }
-

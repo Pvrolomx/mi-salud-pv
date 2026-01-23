@@ -7,7 +7,7 @@ const defaultContacts = [
     type: "fixed",
     name: "Healthcare Resources PV",
     relation: { es: "Tu apoyo médico", en: "Your medical support" },
-    icon: "💙",
+    icon: "⚕️",
     color: "#2563eb",
     phone: "523221234567",
     whatsapp: "523221234567",

@@ -138,7 +138,7 @@ const styles = {
   faqQuestion: { width: "100%", padding: "1rem", display: "flex", justifyContent: "space-between", alignItems: "center", background: "transparent", border: "none", color: "white", cursor: "pointer", textAlign: "left", gap: "1rem" },
   faqQ: { fontSize: "1rem", fontWeight: "500", flex: 1 },
   faqIcon: { fontSize: "1.5rem", color: "rgba(255,255,255,0.6)", flexShrink: 0 },
-  faqAnswer: { padding: "0 1rem 1rem", color: "#a5f3fc", fontSize: "0.95rem", lineHeight: "1.5" },
+  faqAnswer: { padding: "0 1rem 1rem", color: "#a5f3fc", fontSize: "1rem", lineHeight: "1.6", fontWeight: "400" },
   contactSection: { padding: "1.5rem 1rem", textAlign: "center" },
   notFound: { color: "rgba(255,255,255,0.7)", marginBottom: "1rem" },
   whatsappBtn: { padding: "1rem 2rem", background: "#25d366", border: "none", borderRadius: "2rem", color: "white", fontSize: "1.1rem", fontWeight: "600", cursor: "pointer" },

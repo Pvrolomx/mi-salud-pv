@@ -38,32 +38,6 @@ const defaultContacts = [
     email: null,
     address: "Blvd. Francisco Medina Ascencio 2760, Zona Hotelera Norte"
   },
-  { 
-    id: "family1",
-    type: "fixed",
-    name: "Contacto Familiar 1",
-    relation: { es: "Familiar / Amigo", en: "Family / Friend" },
-    icon: "👨‍👩‍👧",
-    color: "#7c3aed",
-    phone: "",
-    whatsapp: "",
-    email: null,
-    address: null,
-    placeholder: true
-  },
-  { 
-    id: "family2",
-    type: "fixed",
-    name: "Contacto Familiar 2",
-    relation: { es: "Familiar / Amigo", en: "Family / Friend" },
-    icon: "👨‍👩‍👦",
-    color: "#7c3aed",
-    phone: "",
-    whatsapp: "",
-    email: null,
-    address: null,
-    placeholder: true
-  },
 ]
 
 const consulateOptions = [

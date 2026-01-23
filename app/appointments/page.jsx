@@ -162,7 +162,7 @@ export default function Appointments() {
         </div>
       )}
       
-      <footer style={styles.footer}>Hecho con 🧡 por C-OG - Colmena 2026</footer>
+      <footer style={styles.footer}>Hecho con 🧡 por duendes.app 2026</footer>
     </main>
   )
 }

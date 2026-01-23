@@ -26,6 +26,44 @@ const defaultContacts = [
     email: null,
     address: null
   },
+  { 
+    id: "hospital-joya",
+    type: "fixed",
+    name: "Hospital Joya",
+    relation: { es: "Frente a Terminal Marítima", en: "Across Maritime Terminal" },
+    icon: "🏥",
+    color: "#059669",
+    phone: "523222262500",
+    whatsapp: "523222262500",
+    email: null,
+    address: "Blvd. Francisco Medina Ascencio 2760, Zona Hotelera Norte"
+  },
+  { 
+    id: "family1",
+    type: "fixed",
+    name: "Contacto Familiar 1",
+    relation: { es: "Familiar / Amigo", en: "Family / Friend" },
+    icon: "👨‍👩‍👧",
+    color: "#7c3aed",
+    phone: "",
+    whatsapp: "",
+    email: null,
+    address: null,
+    placeholder: true
+  },
+  { 
+    id: "family2",
+    type: "fixed",
+    name: "Contacto Familiar 2",
+    relation: { es: "Familiar / Amigo", en: "Family / Friend" },
+    icon: "👨‍👩‍👦",
+    color: "#7c3aed",
+    phone: "",
+    whatsapp: "",
+    email: null,
+    address: null,
+    placeholder: true
+  },
 ]
 
 const consulateOptions = [

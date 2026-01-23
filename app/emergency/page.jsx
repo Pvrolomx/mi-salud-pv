@@ -471,7 +471,7 @@ export default function Emergency() {
         <a href="/" style={styles.homeBtn}>🏠 {t.back}</a>
       </div>
 
-      {process.env.NEXT_PUBLIC_SHOW_FIRMA !== "false" && <footer style={styles.footer}>Hecho con 🧡 por duendes.app 2026</footer>}
+      {process.env.NEXT_PUBLIC_SHOW_FIRMA !== "false" && <footer style={styles.footer}>{lang === "es" ? "Hecho con 🧡 por duendes.app 2026" : "Made with 🧡 by duendes.app 2026"}</footer>}
     </main>
   )
 }
